@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
-import {View, Text, TextInput, StyleSheet, Alert} from 'react-native';
-import {RNCamera} from 'react-native-camera';
+import React, { useState } from 'react';
+import { View, Text, Button, Alert, StyleSheet } from 'react-native';
+import { RNCamera } from 'react-native-camera';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import 'react-native-get-random-values';
 
 const AppPro = () => {
   const [scannedData, setScannedData] = useState(null);

@@ -15,17 +15,10 @@ import {
 import QRCode from 'react-native-qrcode-svg';
 import AppHeader from './components/Header';
 import {Picker} from '@react-native-picker/picker';
-import DropDownPicker from 'react-native-dropdown-picker';
 import 'react-native-get-random-values';
 import CryptoJS from 'crypto-js';
 import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
-
-// const secretKey = 'goa-police-as12erW';
-
-// const encryptData = data => {
-//   return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
-// };
 
 const App = () => {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -99,6 +92,13 @@ const App = () => {
     );
   }, []);
 
+  const date = moment().format('YYYY-MM-DD');
+  const secretKey = CryptoJS.SHA256(date).toString();
+  // Function to generate HMAC signature for tamper protection
+  const generateHMACSignature = (data, secretKey) => {
+    return CryptoJS.HmacSHA256(JSON.stringify(data), secretKey).toString();
+  };
+
   // Generate QR code with 4-hour validity
   const generatePass = () => {
     if (!mobileNumber || !carNumber) {
@@ -117,15 +117,20 @@ const App = () => {
       issuedLocation: location ? location : null,
     });
 
-    const date = moment().format('YYYY-MM-DD');
-    const secretKey = CryptoJS.SHA256(date).toString();
     const encryptedQRData = CryptoJS.AES.encrypt(
       JSON.stringify(qrData),
       secretKey,
     ).toString();
 
+    const hmacSignature = generateHMACSignature(qrData, secretKey);
+
+    const finalQRData = {
+      encryptedQRData,
+      hmacSignature,
+    };
+
     // const encryptedData = encryptData(qrData);
-    setQrValue(encryptedQRData);
+    setQrValue(JSON.stringify(finalQRData));
     setValidUntil(expirationTime);
     setIsGenerated(true);
   };
