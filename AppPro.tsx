@@ -162,50 +162,41 @@ const AppPro = () => {
               {passStatus}
             </Text>
 
-            {qrData && (
-              <>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Mobile Number:</Text>
-                  <Text style={styles.value}>
-                    {qrData.mobileNumber || 'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Car Number:</Text>
-                  <Text style={styles.value}>{qrData.carNumber || 'N/A'}</Text>
-                </View>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Violation:</Text>
-                  <Text style={styles.value}>
-                    {qrData['violation'] || 'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Latitude:</Text>
-                  <Text style={styles.value}>
-                    <Text style={styles.value}>
-                      {qrData.issuedLocation?.latitude || 'N/A'}
-                    </Text>
-                  </Text>
-                </View>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Longitude:</Text>
-                  <Text style={styles.value}>
-                    {qrData.issuedLocation?.longitude || 'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.cardRow}>
-                  <Text style={styles.label}>Valid Until:</Text>
-                  <Text style={styles.value}>
-                    {qrData.validUntil
-                      ? moment(qrData.validUntil).format('YYYY-MM-DD HH:mm:ss')
-                      : 'N/A'}
-                  </Text>
-                </View>
-              </>
-            )}
+            {/* Conditional rendering based on pass validity */}
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Mobile Number:</Text>
+              <Text style={styles.value}>{qrData?.mobileNumber || 'N/A'}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Car Number:</Text>
+              <Text style={styles.value}>{qrData?.carNumber || 'N/A'}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Violation:</Text>
+              <Text style={styles.value}>{qrData?.violation || 'N/A'}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Latitude:</Text>
+              <Text style={styles.value}>
+                {qrData?.issuedLocation?.latitude || 'N/A'}
+              </Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Longitude:</Text>
+              <Text style={styles.value}>
+                {qrData?.issuedLocation?.longitude || 'N/A'}
+              </Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Valid Until:</Text>
+              <Text style={styles.value}>
+                {qrData?.validUntil
+                  ? moment(qrData.validUntil).format('YYYY-MM-DD HH:mm:ss')
+                  : 'N/A'}
+              </Text>
+            </View>
 
-            <Button title="Scan Again" onPress={() => setScanned(false)} />
+            <Button title="Scan Again" onPress={resetScanner} />
           </View>
         )}
       </View>

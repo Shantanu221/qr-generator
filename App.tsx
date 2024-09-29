@@ -128,7 +128,7 @@ const App = () => {
 
     const qrData = JSON.stringify({
       mobileNumber,
-      carNumber,
+      carNumber: carNumber.toUpperCase(),
       violation,
       validUntil: expirationTime,
       issuedLocation: location ? location : null,
