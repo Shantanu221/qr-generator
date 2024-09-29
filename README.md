@@ -43,10 +43,10 @@ This project provides a secure and efficient QR code-based system for police off
 Link to demo video: [Demo Video](https://link-to-demo-video.com)
 
 ## **Contributors**
-- **[Your Name]** - Full Stack Developer
-- **[Team Member 1]** - Mobile App Developer
-- **[Team Member 2]** - Security Expert
-- **[Team Member 3]** - UI/UX Designer
+- **[Shantanu Ingale]** - Full Stack Developer,ML
+- **[Anant Mahambrey]** - UI/UX,Ml
+- **[Poonam Prabhugaonkar]** - App Developer,UI/UX
+
 
 ## **License**
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
