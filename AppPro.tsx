@@ -51,7 +51,16 @@ const decryptData = (encryptedData, secretKey, salt) => {
 const AppPro = () => {
   const [scanned, setScanned] = useState(false);
   const [passStatus, setPassStatus] = useState('');
-  const [qrData, setQrData] = useState({});
+  const [qrData, setQrData] = useState({
+    mobileNumber: 'N/A',
+    carNumber: 'N/A',
+    violation: 'N/A',
+    validUntil: 'N/A',
+    issuedLocation: {
+      latitude: 'N/A',
+      longitude: 'N/A',
+    },
+  });
 
   const handleQRCodeRead = e => {
     if (!scanned) {
@@ -64,6 +73,11 @@ const AppPro = () => {
 
         // Decrypt the data
         const decryptedData = decryptData(encryptedQRData, secretKey, salt);
+
+        const parsedQrData =
+          typeof decryptedData === 'string'
+            ? JSON.parse(decryptedData)
+            : decryptedData;
 
         // Verify the HMAC signature
         const isSignatureValid = verifyHMACSignature(
@@ -79,17 +93,29 @@ const AppPro = () => {
         }
 
         // Check pass expiry
-        const isValid = moment().isBefore(decryptedData.validUntil); // Check if current time is before expiry
 
+        // const isValid = moment().isBefore(moment(decryptedData.validUntil)); // Check if current time is before expiry
+        const validUntil = moment(decryptedData.validUntil);
+        const currentTime = moment();
+        let isValid = true;
+        // Check if the pass is expired
+        if (currentTime.isAfter(validUntil)) {
+          isValid = false;
+        } else {
+          isValid = true;
+          // Proceed with valid pass actions (e.g., log, display details, etc.)
+        }
         if (isValid) {
           setPassStatus('Valid Pass');
         } else {
           setPassStatus('Expired Pass');
         }
 
-        setQrData(decryptedData);
+        setQrData(parsedQrData);
+        console.log('data:', qrData);
       } catch (error) {
         Alert.alert('Invalid QR Code', 'The QR code is not valid.');
+        console.log('Error:', error);
         setPassStatus('Invalid Pass');
         setScanned(true);
       }
@@ -102,6 +128,9 @@ const AppPro = () => {
     setPassStatus('');
     setQrData({});
   };
+  useEffect(() => {
+    console.log('Updated qrData:', qrData); // This should show the latest state
+  }, [qrData]);
 
   return (
     <>

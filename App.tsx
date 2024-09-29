@@ -124,14 +124,13 @@ const App = () => {
       return;
     }
 
-    const now = new Date();
-    const expirationTime = new Date(now.getTime() + 4 * 60 * 60 * 1000); // 4 hours from now
+    const expirationTime = moment().add(4, 'hours').toISOString(); // 4 hours from now
 
     const qrData = JSON.stringify({
       mobileNumber,
       carNumber,
       violation,
-      validUntil: expirationTime.toISOString(),
+      validUntil: expirationTime,
       issuedLocation: location ? location : null,
     });
 
@@ -147,7 +146,7 @@ const App = () => {
 
     // const encryptedData = encryptData(qrData);
     setQrValue(JSON.stringify(finalQRData));
-    setValidUntil(expirationTime);
+    setValidUntil(moment(expirationTime));
     setIsGenerated(true);
   };
 
