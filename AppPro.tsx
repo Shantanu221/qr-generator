@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Linking,
   TouchableOpacity,
   ScrollView,
+  Animated,
 } from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import CryptoJS from 'crypto-js';
@@ -51,16 +52,10 @@ const decryptData = (encryptedData, secretKey, salt) => {
 const AppPro = () => {
   const [scanned, setScanned] = useState(false);
   const [passStatus, setPassStatus] = useState('');
-  const [qrData, setQrData] = useState({
-    mobileNumber: 'N/A',
-    carNumber: 'N/A',
-    violation: 'N/A',
-    validUntil: 'N/A',
-    issuedLocation: {
-      latitude: 'N/A',
-      longitude: 'N/A',
-    },
-  });
+  const [qrData, setQrData] = useState({});
+
+  // Animation state for the scanning line
+  const moveAnim = useRef(new Animated.Value(0)).current;
 
   const handleQRCodeRead = e => {
     if (!scanned) {
@@ -127,7 +122,37 @@ const AppPro = () => {
     setScanned(false);
     setPassStatus('');
     setQrData({});
+    startAnimation();
   };
+
+  // Animation logic to move the line up and down
+  // Scanning line animation loop
+  const startAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(moveAnim, {
+          toValue: 1,
+          duration: 2000, // Time for the line to move across the screen
+          useNativeDriver: true,
+        }),
+        Animated.timing(moveAnim, {
+          toValue: 0,
+          duration: 2000, // Time for the line to reset back
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start(); // Start the animation
+  };
+
+  useEffect(() => {
+    startAnimation(); // Start the animation when the component mounts
+  }, []);
+
+  const translateY = moveAnim.interpolate({
+    inputRange: [0.5, 1],
+    outputRange: [0, 150], // Adjust for how far the line should move
+  });
+
   useEffect(() => {
     console.log('Updated qrData:', qrData); // This should show the latest state
   }, [qrData]);
@@ -140,7 +165,18 @@ const AppPro = () => {
             style={styles.camera}
             onBarCodeRead={handleQRCodeRead}
             captureAudio={false}>
+            <View style={styles.overlayTop} />
+            <View style={styles.overlayBottom} />
+            <View style={styles.overlayLeft} />
+            <View style={styles.overlayRight} />
             <View style={styles.scanArea}>
+              {/* Scanning Line Animation */}
+              <Animated.View
+                style={[
+                  styles.scanLine,
+                  {transform: [{translateY}]}, // Apply translation animation
+                ]}
+              />
               <Text style={styles.scanText}>Scan QR Code</Text>
             </View>
           </RNCamera>
@@ -207,46 +243,73 @@ const AppPro = () => {
 export default AppPro;
 
 const styles = StyleSheet.create({
-  centerText: {
-    flex: 1,
-    fontSize: 18,
-    padding: 32,
-    color: '#777',
-  },
-  textBold: {
-    fontWeight: '500',
-    color: '#000',
-  },
-  buttonText: {
-    fontSize: 21,
-    color: 'rgb(0,122,255)',
-  },
-  buttonTouchable: {
-    padding: 16,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   camera: {
-    // flex: 1,
     width: '100%',
-    height: '50%',
+    height: '100%',
   },
   scanArea: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '80%',
+    height: '40%',
     borderColor: '#fff',
     borderWidth: 2,
-    width: '80%',
-    height: '80%',
-    margin: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 3,
+    left: 39,
+    top: 232,
+  },
+  scanLine: {
+    width: '90%',
+    height: 2,
+    backgroundColor: 'red',
+    position: 'absolute',
   },
   scanText: {
-    color: '#fff',
+    color: '#fee5e5',
     fontSize: 18,
+    marginTop: 20,
+    fontWeight: 'bold',
+  },
+  overlayTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent blur effect
+    zIndex: 0,
+  },
+  overlayBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent blur effect
+    zIndex: 0,
+  },
+  overlayLeft: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    left: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent blur effect
+    zIndex: 0,
+  },
+  overlayRight: {
+    position: 'absolute',
+    top: '30%',
+    bottom: '30%',
+    right: 0,
+    width: '10%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent blur effect
+    zIndex: 0,
   },
   card: {
     padding: 20,
@@ -259,12 +322,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   validCard: {
-    backgroundColor: '#e0f7fa', // Light green for valid
+    backgroundColor: '#e0f7fa',
     borderColor: '#00c853',
     borderWidth: 2,
   },
   invalidCard: {
-    backgroundColor: '#ffebee', // Light red for invalid
+    backgroundColor: '#ffebee',
     borderColor: '#d50000',
     borderWidth: 2,
   },
