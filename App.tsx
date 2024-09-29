@@ -30,13 +30,13 @@ const App = () => {
   const [isGenerated, setIsGenerated] = useState(false);
 
   const violations = [
-    'no license',
-    'expired vehicle reg.',
-    'no valid insurance',
-    'no PUC',
-    'overloading of passengers',
-    'illegal modifications',
-    'nil',
+    'No license',
+    'Expired vehicle registration',
+    'No valid insurance',
+    'No PUC',
+    'Overloading of Passengers',
+    'Illegal modifications',
+    'Nil',
   ];
 
   const currentDate = new Date();
@@ -93,10 +93,28 @@ const App = () => {
   }, []);
 
   const date = moment().format('YYYY-MM-DD');
-  const secretKey = CryptoJS.SHA256(date).toString();
+  // const secretKey = CryptoJS.SHA256(date).toString();
+  const secretKey = 'hey-you';
+
   // Function to generate HMAC signature for tamper protection
   const generateHMACSignature = (data, secretKey) => {
     return CryptoJS.HmacSHA256(JSON.stringify(data), secretKey).toString();
+  };
+
+  // Function to generate a random salt
+  const generateSalt = () => {
+    return CryptoJS.lib.WordArray.random(16).toString(); // Generate a 16-byte salt
+  };
+
+  // Function to encrypt data
+  const encryptData = (data, secretKey) => {
+    const salt = generateSalt(); // Generate a new salt for this encryption
+    const saltedKey = CryptoJS.SHA256(secretKey + salt).toString(); // Combine key with salt
+    const encrypted = CryptoJS.AES.encrypt(
+      JSON.stringify(data),
+      saltedKey,
+    ).toString();
+    return {encryptedData: encrypted, salt}; // Return encrypted data and salt
   };
 
   // Generate QR code with 4-hour validity
@@ -117,16 +135,14 @@ const App = () => {
       issuedLocation: location ? location : null,
     });
 
-    const encryptedQRData = CryptoJS.AES.encrypt(
-      JSON.stringify(qrData),
-      secretKey,
-    ).toString();
+    const {encryptedData, salt} = encryptData(qrData, secretKey);
 
     const hmacSignature = generateHMACSignature(qrData, secretKey);
 
     const finalQRData = {
-      encryptedQRData,
+      encryptedQRData: encryptedData,
       hmacSignature,
+      salt,
     };
 
     // const encryptedData = encryptData(qrData);
