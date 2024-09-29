@@ -40,7 +40,7 @@ This project provides a secure and efficient QR code-based system for police off
 3. **Verify the Pass:** The system will automatically verify the pass by decrypting the data and checking its validity. If the QR code is tampered with or expired, the app will alert the officer.
 
 ## **Demo**
-Link to demo video: [Demo Video](https://link-to-demo-video.com)
+Link to demo video: [Demo Video]([https://link-to-demo-video.com](https://drive.google.com/file/d/17qV2AlNT2Fj60qKdGXk99iaAWMtIs7OY/view?usp=drive_link))
 
 ## **Contributors**
 - **[Shantanu Ingale]** - Full Stack Developer,ML
